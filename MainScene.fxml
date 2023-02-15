@@ -5,26 +5,27 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
-
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="869.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainSceneController">
    <children>
-      <ListView fx:id="songlist" prefHeight="336.0" prefWidth="437.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <Text layoutX="39.0" layoutY="377.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" wrappingWidth="39.73681640625" />
-      <Text layoutX="39.0" layoutY="417.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Artist:" wrappingWidth="39.73681640625" />
-      <Text layoutX="39.0" layoutY="454.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Album:" wrappingWidth="39.73681640625" />
-      <Text layoutX="39.0" layoutY="494.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Year:" wrappingWidth="39.73681640625" />
-      <TextField fx:id="name" layoutX="90.0" layoutY="359.0" prefHeight="26.0" prefWidth="332.0" />
-      <TextField fx:id="artist" layoutX="90.0" layoutY="399.0" prefHeight="26.0" prefWidth="332.0" />
-      <TextField fx:id="album" layoutX="90.0" layoutY="436.0" prefHeight="26.0" prefWidth="332.0" />
-      <TextField fx:id="year" layoutX="90.0" layoutY="476.0" prefHeight="26.0" prefWidth="332.0" />
-      <ButtonBar layoutX="26.0" layoutY="502.0" prefHeight="85.0" prefWidth="417.0">
+      <ListView fx:id="songlist" layoutY="-1.0" onMouseClicked="#displaysong" prefHeight="600.0" prefWidth="418.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="-1.0" />
+      <Text layoutX="441.0" layoutY="375.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" wrappingWidth="39.73681640625" />
+      <Text layoutX="441.0" layoutY="415.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Artist:" wrappingWidth="39.73681640625" />
+      <Text layoutX="441.0" layoutY="452.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Album:" wrappingWidth="39.73681640625" />
+      <Text layoutX="441.0" layoutY="492.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Year:" wrappingWidth="39.73681640625" />
+      <TextField fx:id="name" layoutX="492.0" layoutY="357.0" prefHeight="26.0" prefWidth="332.0" />
+      <TextField fx:id="artist" layoutX="492.0" layoutY="397.0" prefHeight="26.0" prefWidth="332.0" />
+      <TextField fx:id="album" layoutX="492.0" layoutY="434.0" prefHeight="26.0" prefWidth="332.0" />
+      <TextField fx:id="year" layoutX="492.0" layoutY="474.0" prefHeight="26.0" prefWidth="332.0" />
+      <ButtonBar layoutX="428.0" layoutY="500.0" prefHeight="85.0" prefWidth="417.0">
         <buttons>
             <Button mnemonicParsing="false" onMouseClicked="#addsong" prefHeight="45.0" prefWidth="330.0" text="Add" />
             <Button minWidth="39.0" mnemonicParsing="false" onMouseClicked="#editsong" prefHeight="45.0" text="Edit" />
           <Button mnemonicParsing="false" onMouseClicked="#deletesong" prefHeight="45.0" prefWidth="184.0" text="Delete" />
         </buttons>
       </ButtonBar>
+      <VBox fx:id="display" layoutX="496.0" layoutY="73.0" prefHeight="269.0" prefWidth="362.0" />
    </children>
 </AnchorPane>
