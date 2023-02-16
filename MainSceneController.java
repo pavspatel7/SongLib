@@ -14,6 +14,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+
+import java.util.function.Predicate;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -70,6 +73,7 @@ public class MainSceneController
 				};
 			}	
 		});
+		displaysong();
 	}
 	
 	@FXML
@@ -81,8 +85,8 @@ public class MainSceneController
 			int first = element.indexOf("|");
 			int second = element.indexOf("|", first+1);
 			String check = element.substring(0, second);
-			
-			if(!songs.toString().toLowerCase().contains(check.toLowerCase()))
+			Predicate<String> duplicate = (String s) -> (s.substring(0, s.indexOf("|",s.indexOf("|")+1)).trim().equalsIgnoreCase(check.trim()));
+			if(!songs.stream().anyMatch(duplicate))
 			{
 				songs.add(element);
 				FXCollections.sort(songs);
@@ -123,8 +127,8 @@ public class MainSceneController
 			int first = element.indexOf("|");
 			int second = element.indexOf("|", first+1);
 			String check = element.substring(0, second);
-			System.out.println(songs.toString());
-			if(!songs.toString().toLowerCase().contains(check.toLowerCase()))
+			Predicate<String> duplicate = (String s) -> (s.substring(0, s.indexOf("|",s.indexOf("|")+1)).trim().equalsIgnoreCase(check.trim()));
+			if(!songs.stream().anyMatch(duplicate))
 				songs.set(selectedID, element);
 		}
 		name.clear();
