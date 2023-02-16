@@ -1,12 +1,15 @@
-/* Three things left:
- * Don't allow duplicates and show dialog box when duplicate detected
- * Dialog box for edit and delete
+/* Four things left:
  * File I/O
+ * package
+ * read all and make sure
+ * java comments
  */
 
 package application;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -14,15 +17,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-
+import java.util.Optional;
 import java.util.function.Predicate;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class MainSceneController
 {
-
 	@FXML
 	private TextField album;
 
@@ -39,7 +40,7 @@ public class MainSceneController
 	
 	@FXML
 	private TextField year;
-	
+
 	@FXML
 	private VBox display;
 
@@ -47,7 +48,7 @@ public class MainSceneController
 	{
 		songs = FXCollections.observableArrayList();
 		songlist.setItems(songs);
-		
+
 		songlist.setCellFactory(new Callback<ListView<String>, ListCell<String>>()
 		{
 			@Override
@@ -71,11 +72,10 @@ public class MainSceneController
 						}
 					}
 				};
-			}	
+			}
 		});
-		displaysong();
 	}
-	
+
 	@FXML
 	public void addsong(MouseEvent event)
 	{
@@ -89,10 +89,18 @@ public class MainSceneController
 			if(!songs.stream().anyMatch(duplicate))
 			{
 				songs.add(element);
-				FXCollections.sort(songs);
+				FXCollections.sort(songs, String.CASE_INSENSITIVE_ORDER);
 				int index = songs.indexOf(element);
 				songlist.getSelectionModel().select(index);
 				displaysong();
+			}
+			else
+			{
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("ALERT!!!");
+				alert.setHeaderText(null);
+				alert.setContentText("The song detail that you are trying to enter already exists.");
+				alert.showAndWait();
 			}
 		}
 		name.clear();
@@ -105,13 +113,24 @@ public class MainSceneController
 	public void deletesong(MouseEvent event)
 	{
 		int selectedID = songlist.getSelectionModel().getSelectedIndex();
-		if(selectedID != -1) {
-			songs.remove(selectedID);
-			if(selectedID>=songs.size())
-				selectedID -= 1;
-			if(!songs.isEmpty())
+		if(selectedID != -1)
+		{
+			Alert confirm = new Alert(Alert.AlertType.WARNING);
+			confirm.setTitle("WARNING!!!");
+			confirm.setContentText("Are you sure you want to delete selected song details?");
+			confirm.setHeaderText(null);
+			confirm.setResizable(false);
+			confirm.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+			Optional<ButtonType> result = confirm.showAndWait();
+			if(result.get() == ButtonType.OK)
 			{
-				songlist.getSelectionModel().select(selectedID);
+				songs.remove(selectedID);
+				if(selectedID>=songs.size())
+					selectedID -= 1;
+				if(!songs.isEmpty())
+				{
+					songlist.getSelectionModel().select(selectedID);
+				}
 			}
 			displaysong();
 		}
@@ -129,7 +148,30 @@ public class MainSceneController
 			String check = element.substring(0, second);
 			Predicate<String> duplicate = (String s) -> (s.substring(0, s.indexOf("|",s.indexOf("|")+1)).trim().equalsIgnoreCase(check.trim()));
 			if(!songs.stream().anyMatch(duplicate))
-				songs.set(selectedID, element);
+			{
+				Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+				confirm.setTitle("CONFIRMATION REQUIRED!!!");
+				confirm.setContentText("Are you sure you want to edit selected song details with new entered data?");
+				confirm.setHeaderText(null);
+				confirm.setResizable(false);
+				confirm.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+				Optional<ButtonType> result = confirm.showAndWait();
+				if(result.get() == ButtonType.OK)
+				{
+					songs.set(selectedID, element);
+					int index = songs.indexOf(element);
+					songlist.getSelectionModel().select(index);
+					displaysong();
+				}
+			}
+			else
+			{
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle("ALERT!!!");
+				alert.setHeaderText(null);
+				alert.setContentText("The song detail that you are trying to enter already exists.");
+				alert.showAndWait();
+			}
 		}
 		name.clear();
 		album.clear();
@@ -146,7 +188,8 @@ public class MainSceneController
 	    Label label2 = new Label("Artist: ");
 	    Label label3 = new Label("Album: ");
 	    Label label4 = new Label("Year: ");
-	    if(!songs.isEmpty()) {
+	    if(!songs.isEmpty()) 
+	    {
 	    	
 			int selectedID = songlist.getSelectionModel().getSelectedIndex();
 			StringBuilder element = new StringBuilder(songs.get(selectedID));
