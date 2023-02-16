@@ -1,12 +1,15 @@
-/* Three things left:
- * Don't allow duplicates and show dialog box when duplicate detected
- * Dialog box for edit and delete
+/* Four things left:
+ * Don't allow duplicates - Huzaif
+ * Dialog box for duplicate - Pavitra
  * File I/O
+ * sort
  */
 
 package application;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -15,14 +18,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
-import java.util.function.Predicate;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class MainSceneController
 {
-
 	@FXML
 	private TextField album;
 
@@ -39,7 +41,7 @@ public class MainSceneController
 	
 	@FXML
 	private TextField year;
-	
+
 	@FXML
 	private VBox display;
 
@@ -47,7 +49,7 @@ public class MainSceneController
 	{
 		songs = FXCollections.observableArrayList();
 		songlist.setItems(songs);
-		
+
 		songlist.setCellFactory(new Callback<ListView<String>, ListCell<String>>()
 		{
 			@Override
@@ -71,11 +73,10 @@ public class MainSceneController
 						}
 					}
 				};
-			}	
+			}
 		});
-		displaysong();
 	}
-	
+
 	@FXML
 	public void addsong(MouseEvent event)
 	{
@@ -85,8 +86,8 @@ public class MainSceneController
 			int first = element.indexOf("|");
 			int second = element.indexOf("|", first+1);
 			String check = element.substring(0, second);
-			Predicate<String> duplicate = (String s) -> (s.substring(0, s.indexOf("|",s.indexOf("|")+1)).trim().equalsIgnoreCase(check.trim()));
-			if(!songs.stream().anyMatch(duplicate))
+			
+			if(!songs.toString().toLowerCase().contains(check.toLowerCase()))
 			{
 				songs.add(element);
 				FXCollections.sort(songs);
@@ -105,13 +106,24 @@ public class MainSceneController
 	public void deletesong(MouseEvent event)
 	{
 		int selectedID = songlist.getSelectionModel().getSelectedIndex();
-		if(selectedID != -1) {
-			songs.remove(selectedID);
-			if(selectedID>=songs.size())
-				selectedID -= 1;
-			if(!songs.isEmpty())
+		if(selectedID != -1) 
+		{
+			Alert confirm = new Alert(Alert.AlertType.WARNING);
+			confirm.setTitle("WARNING!!!");
+			confirm.setContentText("Are you sure you want to delete selected song details?");
+			confirm.setHeaderText(null);
+			confirm.setResizable(false);
+			confirm.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+			Optional<ButtonType> result = confirm.showAndWait();
+			if(result.get() == ButtonType.OK)
 			{
-				songlist.getSelectionModel().select(selectedID);
+				songs.remove(selectedID);
+				if(selectedID>=songs.size())
+					selectedID -= 1;
+				if(!songs.isEmpty())
+				{
+					songlist.getSelectionModel().select(selectedID);
+				}
 			}
 			displaysong();
 		}
@@ -127,9 +139,23 @@ public class MainSceneController
 			int first = element.indexOf("|");
 			int second = element.indexOf("|", first+1);
 			String check = element.substring(0, second);
-			Predicate<String> duplicate = (String s) -> (s.substring(0, s.indexOf("|",s.indexOf("|")+1)).trim().equalsIgnoreCase(check.trim()));
-			if(!songs.stream().anyMatch(duplicate))
-				songs.set(selectedID, element);
+			if(!songs.toString().toLowerCase().contains(check.toLowerCase()))
+			{
+				Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+				confirm.setTitle("CONFIRMATION REQUIRED!!!");
+				confirm.setContentText("Are you sure you want to edit selected song details with new entered data?");
+				confirm.setHeaderText(null);
+				confirm.setResizable(false);
+				confirm.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+				Optional<ButtonType> result = confirm.showAndWait();
+				if(result.get() == ButtonType.OK)
+				{
+					songs.set(selectedID, element);
+					int index = songs.indexOf(element);
+					songlist.getSelectionModel().select(index);
+					displaysong();
+				}
+			}
 		}
 		name.clear();
 		album.clear();
