@@ -1,3 +1,9 @@
+/* Three things left:
+ * Don't allow duplicates and show dialog box when duplicate detected
+ * Dialog box for edit and delete
+ * File I/O
+ */
+
 package application;
 
 import javafx.fxml.FXML;
@@ -49,21 +55,16 @@ public class MainSceneController
 					protected void updateItem(String item, boolean empty)
 					{
 						super.updateItem(item, empty);
-						if(empty || item == null)
+						if(!empty && item != null)
 						{
-							setGraphic(null);
+							int firstIndex = item.indexOf("|");
+							int secondIndex = item.indexOf("|", firstIndex + 1);
+							Label l = new Label(item.substring(0, secondIndex));
+							setGraphic(l);
 						}
 						else
 						{
-							StringBuilder sb = new StringBuilder(item);
-							if(sb.charAt(0) == '.')
-							{
-								sb.delete(0, 3);
-							}
-							int firstIndex = sb.indexOf(",");
-							int secondIndex = sb.indexOf(",", firstIndex + 1);
-							Label l = new Label(sb.substring(0, secondIndex));
-							setGraphic(l);
+							setGraphic(null);
 						}
 					}
 				};
@@ -74,19 +75,21 @@ public class MainSceneController
 	@FXML
 	public void addsong(MouseEvent event)
 	{
-		String element="";
-		if(songs.isEmpty())
-		{
-			element = "., ";
-		}
-		element += name.getText()+", "+artist.getText()+", "+album.getText()+", "+year.getText()+".";
+		String element = name.getText()+" | "+artist.getText()+" | "+album.getText()+" | "+year.getText();
 		if(!name.getText().isEmpty() && !artist.getText().isEmpty())
 		{
-			int first = element.indexOf(",");
-			int second = element.indexOf(",", first+1);
-			String check = "., " + element.substring(0, second);
-			if(!songs.toString().contains(check))
+			int first = element.indexOf("|");
+			int second = element.indexOf("|", first+1);
+			String check = element.substring(0, second);
+			
+			if(!songs.toString().toLowerCase().contains(check.toLowerCase()))
+			{
 				songs.add(element);
+				FXCollections.sort(songs);
+				int index = songs.indexOf(element);
+				songlist.getSelectionModel().select(index);
+				displaysong();
+			}
 		}
 		name.clear();
 		album.clear();
@@ -98,23 +101,30 @@ public class MainSceneController
 	public void deletesong(MouseEvent event)
 	{
 		int selectedID = songlist.getSelectionModel().getSelectedIndex();
-		if(selectedID != -1)
+		if(selectedID != -1) {
 			songs.remove(selectedID);
-		display.getChildren().clear();
+			if(selectedID>=songs.size())
+				selectedID -= 1;
+			if(!songs.isEmpty())
+			{
+				songlist.getSelectionModel().select(selectedID);
+			}
+			displaysong();
+		}
 	}
 	
 	@FXML
 	public void editsong(MouseEvent event)
 	{
 		int selectedID = songlist.getSelectionModel().getSelectedIndex();
-		String element = name.getText()+", "+artist.getText()+", "+album.getText()+", "+year.getText()+".";
+		String element = name.getText()+" | "+artist.getText()+" | "+album.getText()+" | "+year.getText();
 		if(selectedID != -1 && !name.getText().isEmpty() && !artist.getText().isEmpty())
 		{
-			int first = element.indexOf(",");
-			int second = element.indexOf(",", first+1);
-			String check = "., " + element.substring(0, second);
+			int first = element.indexOf("|");
+			int second = element.indexOf("|", first+1);
+			String check = element.substring(0, second);
 			System.out.println(songs.toString());
-			if(!songs.toString().contains(check))
+			if(!songs.toString().toLowerCase().contains(check.toLowerCase()))
 				songs.set(selectedID, element);
 		}
 		name.clear();
@@ -126,30 +136,33 @@ public class MainSceneController
 	
 	@FXML
 	public void displaysong()
-	{
-		int selectedID = songlist.getSelectionModel().getSelectedIndex();
-		StringBuilder element = new StringBuilder(songs.get(selectedID));
-		if(element.charAt(0)== '.')
-		{
-			element.delete(0, 3);
-		}
-		
-		int firstIndex = element.indexOf(",");
-		int secondIndex = element.indexOf(",", firstIndex + 1);
-		int thirdIndex = element.indexOf(",", secondIndex + 1);
-		
-		String first = element.substring(0, firstIndex);
-		String second = element.substring(firstIndex + 1, secondIndex);
-		String third = element.substring(secondIndex + 1, thirdIndex);
-		String fourth = element.substring(thirdIndex + 1);
-		fourth = fourth.substring(0, fourth.length()-1);
-		
+	{	
 		Label label0 = new Label("Selected Song Details: ");
-		Label label1 = new Label("Name: " + first);
-	    Label label2 = new Label("Artist: " + second);
-	    Label label3 = new Label("Album: " + third);
-	    Label label4 = new Label("Year: " + fourth);
-	    
+		Label label1 = new Label("Name: ");
+	    Label label2 = new Label("Artist: ");
+	    Label label3 = new Label("Album: ");
+	    Label label4 = new Label("Year: ");
+	    if(!songs.isEmpty()) {
+	    	
+			int selectedID = songlist.getSelectionModel().getSelectedIndex();
+			StringBuilder element = new StringBuilder(songs.get(selectedID));
+			
+			int firstIndex = element.indexOf("|");
+			int secondIndex = element.indexOf("|", firstIndex + 1);
+			int thirdIndex = element.indexOf("|", secondIndex + 1);
+			
+			String first = element.substring(0, firstIndex);
+			String second = element.substring(firstIndex + 1, secondIndex);
+			String third = element.substring(secondIndex + 1, thirdIndex);
+			String fourth = element.substring(thirdIndex + 1);
+			fourth = fourth.substring(0, fourth.length());
+			
+			label0.setText("Selected Song Details: ");
+			label1.setText("Name: " + first);
+		    label2.setText("Artist: " + second);
+		    label3.setText("Album: " + third);
+		    label4.setText("Year: " + fourth);
+	    }
 	    display.getChildren().clear();
 	    display.setSpacing(10);
 	    display.getChildren().addAll(label0, label1, label2, label3, label4);
