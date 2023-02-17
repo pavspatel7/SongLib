@@ -1,6 +1,6 @@
-/* Four things left:
- * File I/O
- * package
+//Pavitra Patel (php51), Huzaif Mansuri (htm23)
+
+/* Two things left:
  * read all and make sure
  * java comments
  */
@@ -17,13 +17,36 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.function.Predicate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class MainSceneController
 {
+	static File inputFile;
+	static Scanner sc;
+	//static BufferedWriter bfw;
+	
+	static {
+		try
+		{
+			inputFile = new File("input.txt");
+			inputFile.createNewFile();
+			sc = new Scanner(inputFile);
+			//bfw = new BufferedWriter(fw);
+		}
+		catch (IOException e) 
+		{
+		     throw new ExceptionInInitializerError(e.getMessage());
+	    }
+	}
 	@FXML
 	private TextField album;
 
@@ -44,11 +67,16 @@ public class MainSceneController
 	@FXML
 	private VBox display;
 
-	public void start()
+	public void start() throws IOException
 	{
 		songs = FXCollections.observableArrayList();
 		songlist.setItems(songs);
-
+		while(sc.hasNext()) {
+			String song = sc.nextLine();
+			songs.add(song);
+		}
+		sc.close();
+		displaysong();
 		songlist.setCellFactory(new Callback<ListView<String>, ListCell<String>>()
 		{
 			@Override
@@ -76,8 +104,13 @@ public class MainSceneController
 		});
 	}
 
+	public ObservableList<String> storeData()
+	{
+		return songs;
+	}
+	
 	@FXML
-	public void addsong(MouseEvent event)
+	public void addsong(MouseEvent event) throws IOException
 	{
 		String element = name.getText()+" | "+artist.getText()+" | "+album.getText()+" | "+year.getText();
 		if(!name.getText().isEmpty() && !artist.getText().isEmpty())
@@ -192,6 +225,8 @@ public class MainSceneController
 	    {
 	    	
 			int selectedID = songlist.getSelectionModel().getSelectedIndex();
+			if(selectedID == -1)
+				selectedID = 0;
 			StringBuilder element = new StringBuilder(songs.get(selectedID));
 			
 			int firstIndex = element.indexOf("|");
