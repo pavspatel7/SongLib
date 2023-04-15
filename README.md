@@ -1,6 +1,6 @@
 # SongLib by Pavitra Patel & Huzaif Mansuri
 
-Important Notice: Fall 2022 course project for CS214 at Rutgers University. Please follow Rutgers University Academic Integrity Policy.
+Important Notice: Spring 2023 course project for CS213 at Rutgers University. Please follow Rutgers University Academic Integrity Policy.
 
 **Description:** Design and implement an application with a graphical user interface to manage a library of songs.
 
